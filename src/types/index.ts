@@ -2,16 +2,29 @@ export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 export interface IApi {
     baseUrl: string;
+    options: RequestInit
     get<T>(uri: string): Promise<T>;
     post<T>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
+    handleResponse(response: Response): Promise<object>;
 }
 
 export type EventName = string | RegExp;
 
+export type Subscriber = Function
+
+export interface EmitterEvent {
+    eventName: string,
+    data: unknown
+}
+
 export interface IEvents {
-    on<T extends object>(event: EventName, callback: (data: T) => void): void;
-    emit<T extends object>(event: string, data?: T): void;
-    trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
+    events: Map<EventName, Set<Subscriber>>
+    on<T>(event: EventName, callback: (data: T) => void): void;
+    off(eventName: EventName, callback: Subscriber): void;
+    emit<T>(event: string, data?: T): void;
+    onAll(callback: (event: EmitterEvent) => void): void;
+    offAll(): void;
+    trigger<T>(event: string, context?: Partial<T>): (data: T) => void;
 }
 
 export interface IItem {
@@ -36,7 +49,7 @@ export interface IModalData {
 }
 
 export interface IBasketView {
-    items: IItem[];
+    items: HTMLElement[];
     total: number;
 }
 
@@ -56,7 +69,7 @@ export type FormErrors = Partial<Record<keyof IOrder, string>>;
 
 export interface IFormState {
     valid: boolean;
-    errors: string[];
+    errors: string;
 }
 
 export interface ISuccess {
@@ -68,7 +81,7 @@ export interface ISuccessActions {
 }
 
 export interface IOrderResult {
-    items: string[];
+    id: string;
     total: number;
 }
 
