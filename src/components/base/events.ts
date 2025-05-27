@@ -28,7 +28,7 @@ export class EventEmitter implements IEvents {
     /**
      * Установить обработчик на событие
      */
-    on<T extends object>(eventName: EventName, callback: (event: T) => void) {
+    on<T>(eventName: EventName, callback: (event: T) => void) {
         if (!this._events.has(eventName)) {
             this._events.set(eventName, new Set<Subscriber>());
         }
@@ -50,7 +50,7 @@ export class EventEmitter implements IEvents {
     /**
      * Инициировать событие с данными
      */
-    emit<T extends object>(eventName: string, data?: T) {
+    emit<T>(eventName: string, data?: T) {
         this._events.forEach((subscribers, name) => {
             if (name === '*') subscribers.forEach(callback => callback({
                 eventName,
@@ -79,7 +79,7 @@ export class EventEmitter implements IEvents {
     /**
      * Сделать коллбек триггер, генерирующий событие при вызове
      */
-    trigger<T extends object>(eventName: string, context?: Partial<T>) {
+    trigger<T>(eventName: string, context?: Partial<T>) {
         return (event: object = {}) => {
             this.emit(eventName, {
                 ...(event || {}),
