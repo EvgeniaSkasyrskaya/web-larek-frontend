@@ -1,5 +1,5 @@
-import { Api, ApiListResponse } from "./components/base/api";
-import { IAppApi, IOrderResult, IItem, IOrder } from "./types";
+import { Api, ApiListResponse } from "./base/api"
+import { IAppApi, IOrderResult, IItem, IOrder } from "../types";
 
 export class AppApi extends Api implements IAppApi 
 {

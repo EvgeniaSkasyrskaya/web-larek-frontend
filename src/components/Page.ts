@@ -1,7 +1,8 @@
-import { Component } from "./components/base/component";
-import { IEvents } from "./types";
-import { IPage } from "./types";
-import { ensureElement } from "./utils/utils";
+import { Component } from "./base/component";
+import { AppEvents, IEvents } from "../types";
+import { IPage } from "../types";
+import { ensureElement } from "../utils/utils";
+import { AppState } from "./AppState";
 
 export class Page extends Component<IPage> implements IPage {
     protected gallery: HTMLElement;
@@ -16,7 +17,7 @@ export class Page extends Component<IPage> implements IPage {
         this.basketCounter = ensureElement<HTMLElement>('.header__basket-counter', container);
         this.events = events;
 
-        this.buttonElement.addEventListener('click', () => events.emit('basket:open'));
+        this.buttonElement.addEventListener('click', () => events.emit(AppEvents["basket:open"]));
     }
 
     set catalog(items: HTMLElement[]) {

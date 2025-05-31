@@ -1,7 +1,7 @@
-import { Component } from "./components/base/component";
-import { IEvents } from "./types";
-import { IItem, ICardActions } from "./types";
-import { ensureElement } from "./utils/utils";
+import { Component } from "./base/component";
+import { IEvents } from "../types";
+import { IItem, ICardActions } from "../types";
+import { ensureElement } from "../utils/utils";
 
 export class Card extends Component<IItem> implements IItem {
     protected imageElement?: HTMLImageElement; 
@@ -49,16 +49,22 @@ export class Card extends Component<IItem> implements IItem {
     this.setImage(this.imageElement, value, this.title)
   }
   
+  protected categoryColor = <Record<string, string>> {
+    'софт-скил': 'soft',
+    'другое': 'other',
+    'дополнительное': 'additional',
+    'кнопка': 'button',
+    'хард-скил': 'hard'
+  }
+  
   set category(value: string) {
     this.setText(this.categoryElement, value);
-    if (value === 'софт-скил') this.categoryElement.classList.add('card__category_soft');
-    if (value === 'другое') this.categoryElement.classList.add('card__category_other');
-    if (value === 'дополнительное') this.categoryElement.classList.add('card__category_additional');
-    if (value === 'кнопка') this.categoryElement.classList.add('card__category_button');
-    if (value === 'хард-скил') this.categoryElement.classList.add('card__category_hard');
+    this.categoryElement.classList.remove('card__category_soft', 'card__category_other', 'card__category_additional', 'card__category_button', 'card__category_hard');
+    this.categoryElement.classList.add(`card__category_${this.categoryColor[value]}`);
   }
 
   set price(value: number) {
+    this.setDisabled(this.buttonElement, !value);
     if (value !== null) {
         this.setText(this.priceElement, value + ' синапсов')
     } else {
@@ -70,7 +76,7 @@ export class Card extends Component<IItem> implements IItem {
     if (value) {
         this.setText(this.buttonElement, 'Убрать из корзины');
     } else {
-    this.setText(this.buttonElement, 'В корзину');
+        this.setText(this.buttonElement, 'В корзину');
     }
   }
 

@@ -1,6 +1,6 @@
-import { Component } from "./components/base/component";
-import { IEvents, IFormState } from "./types";
-import { ensureAllElements, ensureElement } from "./utils/utils";
+import { Component } from "./base/component";
+import { AppEvents, IEvents, IFormState } from "../types";
+import { ensureAllElements, ensureElement } from "../utils/utils";
 
 export abstract class Form<T> extends Component<IFormState> implements IFormState {
     
@@ -15,21 +15,8 @@ export abstract class Form<T> extends Component<IFormState> implements IFormStat
         this.inputElements = Array.from(ensureAllElements('.form__input', container));
         this.submitButtonElement = container.querySelector('button[type=submit]');
         this.errorElement = ensureElement('.form__errors', container);
-        this.events = events;
-       
-        this.inputElements.forEach(input => {
-            input.addEventListener('input', (event: Event) => {
-                const field = input.name;
-                const value = input.value;
-                this.events.emit(`${container.name}-field:input`, {field, value});
-            })
-        })
-     
-        container.addEventListener('submit', (event: Event) => {
-            event.preventDefault();
-            this.events.emit(`${container.name}-form:submit`);
-            })
-        }
+        this.events = events;     
+    }
     
     set valid(value: boolean) {
         this.setDisabled(this.submitButtonElement, !value)
@@ -43,5 +30,4 @@ export abstract class Form<T> extends Component<IFormState> implements IFormStat
         Object.assign(this as object, data ?? {});
         return this.container;
     }
-      
 }

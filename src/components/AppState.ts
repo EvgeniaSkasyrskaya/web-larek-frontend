@@ -1,5 +1,4 @@
-import { IAppState, IItem, IBasket, IOrder, IDeliveryInfo, IContacts } from "./types";
-import { IEvents } from "./types";
+import { IEvents, IAppState, IItem, IOrder, IDeliveryInfo, IContacts, AppEvents, Subscriber } from "../types";
 
 export class AppState implements IAppState {
     catalog: IItem[];
@@ -21,7 +20,7 @@ export class AppState implements IAppState {
 
     setCatalog(items: IItem[]) {
         this.catalog = items;
-        this.events.emit('items:changed');
+        this.events.emit(AppEvents["items:changed"]);
     };
 
     getItem(id: string) {
@@ -34,17 +33,17 @@ export class AppState implements IAppState {
 
     setPreview(id: string) {
         this.preview = id;
-        this.events.emit('preview:changed', id);
+        this.events.emit(AppEvents["preview:changed"], id);
     };
 
     addBasketItem(id: string) {
         this.order.items.push(id);
-        this.events.emit('basket:changed', id);
+        this.events.emit(AppEvents["basket:changed"], id);
     };
 
     deleteBasketItem(id: string) {
         this.order.items = this.order.items.filter((element: string) => element !== id);
-        this.events.emit('basket:changed', id);
+        this.events.emit(AppEvents["basket:changed"], id);
     };
 
     setTotalCost(): void {
@@ -61,7 +60,7 @@ export class AppState implements IAppState {
         this.order.payment = '';
         this.order.email = '';
         this.order.phone = '';
-        this.events.emit('basket:changed');
+        this.events.emit(AppEvents["basket:changed"]);
     };
 
     setPayMethod(value: string) {
@@ -81,13 +80,13 @@ export class AppState implements IAppState {
     
     protected validateDeliveryInfo() {
         if (this.order.payment && this.order.address) {
-            this.events.emit('deliveryInfo:ready');
+            this.events.emit(AppEvents["deliveryInfo:ready"]);
         } else {
             if (!this.order.payment) {
-                this.events.emit('order:validation', 'Необходимо выбрать способ оплаты');
+                this.events.emit(AppEvents["order:validation"], 'Необходимо выбрать способ оплаты');
                 } else {
                 if (!this.order.address) {
-                this.events.emit('order:validation', 'Необходимо указать адрес доставки');
+                this.events.emit(AppEvents["order:validation"], 'Необходимо указать адрес доставки');
                 }
             }
         }     
@@ -95,13 +94,13 @@ export class AppState implements IAppState {
 
     protected validateContacts() {
         if (this.order.email && this.order.phone) {
-            this.events.emit('contacts:ready');
+            this.events.emit(AppEvents["contacts:ready"]);
         } else {
             if (!this.order.email) {
-                this.events.emit('contacts:validation', 'Необходимо указать адрес электронной почты');
+                this.events.emit(AppEvents["contacts:validation"], 'Необходимо указать адрес электронной почты');
             } else {
                 if (!this.order.phone) {
-                this.events.emit('contacts:validation', 'Необходимо указать номер телефона');
+                this.events.emit(AppEvents["contacts:validation"], 'Необходимо указать номер телефона');
                 }
             }
         }     

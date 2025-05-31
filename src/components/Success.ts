@@ -1,5 +1,5 @@
-import { Component } from "./components/base/component";
-import { IEvents, ISuccess } from "./types";
+import { Component } from "./base/component";
+import { AppEvents, IEvents, ISuccess } from "../types";
 
 export class Success extends Component<ISuccess> implements ISuccess {
 
@@ -14,7 +14,7 @@ export class Success extends Component<ISuccess> implements ISuccess {
         this.events = events;
 
         this.buttonElement.addEventListener('click', () => {
-            this.events.emit('order:finished')
+            this.events.emit(AppEvents["order:finished"])
         })
     }
 

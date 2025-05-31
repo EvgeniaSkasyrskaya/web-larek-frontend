@@ -12,12 +12,34 @@ export interface IAppApi {
     sendOrder(order: IOrder): Promise<IOrderResult>;
 }
 
-export type EventName = string | RegExp;
+export enum AppEvents {
+    'items:changed',
+    'item:select',
+    'basket:addItem',
+    'basket:deleteItem',
+    'basket:changed',
+    'basket:open',
+    'delivery:open',
+    'payMethod:select',
+    'order-field:input',
+    'order:validation',
+    'deliveryInfo:ready',
+    'order-form:submit',
+    'contacts-field:input',
+    'contacts:validation',
+    'contacts:ready',
+    'contacts-form:submit',
+    'order:send',
+    'order:finished',
+    'preview:changed'
+}
+
+export type EventName = AppEvents;
 
 export type Subscriber = Function
 
 export interface EmitterEvent {
-    eventName: string,
+    eventName: EventName,
     data: unknown
 }
 
@@ -25,7 +47,7 @@ export interface IEvents {
     _events: Map<EventName, Set<Subscriber>>
     on<T>(event: EventName, callback: (data: T) => void): void;
     off(eventName: EventName, callback: Subscriber): void;
-    emit<T>(event: string, data?: T): void;
+    emit<T>(event: EventName, data?: T): void;
     onAll(callback: (event: EmitterEvent) => void): void;
     offAll(): void;
 }

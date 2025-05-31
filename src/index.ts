@@ -1,17 +1,17 @@
 import './scss/styles.scss';
 import { CDN_URL, API_URL } from './utils/constants';
-import { AppApi } from './AppApi';
+import { AppApi } from './components/AppApi';
 import { EventEmitter } from './components/base/events';
-import { AppState } from './AppState';
-import { IDeliveryInfo, IContacts, IItem } from './types';
+import { AppState } from './components/AppState';
+import { AppEvents, IDeliveryInfo, IContacts, IItem } from './types';
 import { ensureElement, cloneTemplate } from './utils/utils';
-import { Card } from './Card';
-import { Page } from './Page';
-import { Modal } from './Modal';
-import { Basket } from './Basket';
-import { OrderForm } from './OrderForm';
-import { ContactsForm } from './ContactsForm';
-import { Success } from './Success';
+import { Card } from './components/Card';
+import { Page } from './components/Page';
+import { Modal } from './components/Modal';
+import { Basket } from './components/Basket';
+import { OrderForm } from './components/OrderForm';
+import { ContactsForm } from './components/ContactsForm';
+import { Success } from './components/Success';
 
 const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const cardBasketItemTemplate = ensureElement<HTMLTemplateElement>('#card-basket');
@@ -35,24 +35,19 @@ const successView = new Success(cloneTemplate(successTemplateElement), events);
 const cardView = new Card(cloneTemplate(cardViewTemplate), events, {
         onClick: () => {
             if (appState.isItemInBasket(appState.preview)) {
-            events.emit('basket:deleteItem', appState.preview);
+            events.emit(AppEvents['basket:deleteItem'], appState.preview);
             } else {
-            events.emit('basket:addItem', appState.preview);
+            events.emit(AppEvents['basket:addItem'], appState.preview);
             };
         }
 });
-const basketItemView = new Card(cloneTemplate(cardBasketItemTemplate), events, {
-        onClick: () => {         
-            events.emit('basket:deleteItem', appState.preview);
-            } 
-        });
 
-events.onAll((event) => console.log(event.eventName, event.data));
+events.onAll((event) => console.log(event))
 
-events.on('items:changed', () => {
+events.on(AppEvents['items:changed'], () => {
     page.catalog = appState.catalog.map(item => {
           const card = new Card(cloneTemplate(cardCatalogTemplate), events, {
-            onClick: () => events.emit('item:select', item.id)
+            onClick: () => events.emit(AppEvents['item:select'], item.id)
         });
           return card.render({
             id: item.image,
@@ -66,11 +61,11 @@ events.on('items:changed', () => {
     page.counter = appState.order.items.length;    
 });
 
-events.on('item:select', (id: string) => {
+events.on(AppEvents['item:select'], (id: string) => {
     appState.setPreview(id);
  });
 
-events.on('preview:changed', () => {
+events.on(AppEvents['preview:changed'], () => {
     const previewItem: IItem = appState.getItem(appState.preview);
     modalView.render({
         content: cardView.render({
@@ -85,15 +80,15 @@ events.on('preview:changed', () => {
     })
  })
 
-events.on('basket:addItem', (id: string) => {
+events.on(AppEvents['basket:addItem'], (id: string) => {
     appState.addBasketItem(id);
 })
 
-events.on('basket:deleteItem', (id: string) => {
+events.on(AppEvents['basket:deleteItem'], (id: string) => {
     appState.deleteBasketItem(id);
 })
 
-events.on('basket:changed', (id: string) => {
+events.on(AppEvents['basket:changed'], (id: string) => {
     appState.setTotalCost();
     page.render({counter: appState.order.items.length});
     cardView.render({isInBasket: appState.isItemInBasket(id)});
@@ -101,7 +96,7 @@ events.on('basket:changed', (id: string) => {
             items: appState.order.items.map((item) => {
                 const basketItem = appState.getItem(item);
                 const basketItemCard = new Card(cloneTemplate(cardBasketItemTemplate), events, {
-                    onClick: () => events.emit('basket:deleteItem', item)                        
+                    onClick: () => events.emit(AppEvents['basket:deleteItem'], item)                        
                     })
                 return basketItemCard.render({
                     id: item,
@@ -114,13 +109,13 @@ events.on('basket:changed', (id: string) => {
     }) 
 })
 
-events.on('basket:open', () => {
+events.on(AppEvents['basket:open'], () => {
     modalView.render({
         content: basketView.render({
             items: appState.order.items.map((item) => {
                 const basketItem = appState.getItem(item);
                 const basketItemCard = new Card(cloneTemplate(cardBasketItemTemplate), events, {
-                    onClick: () => events.emit('basket:deleteItem', item)                        
+                    onClick: () => events.emit(AppEvents['basket:deleteItem'], item)                        
                     })
                 return basketItemCard.render({
                     id: item,
@@ -134,7 +129,7 @@ events.on('basket:open', () => {
     })
 })
 
-events.on('delivery:open', () => {
+events.on(AppEvents['delivery:open'], () => {
     modalView.render({
         content: orderFormView.render({
             address: appState.order.address,
@@ -145,29 +140,29 @@ events.on('delivery:open', () => {
     });
 })
 
-events.on('payMethod:select', (data: string) => {
+events.on(AppEvents['payMethod:select'], (data: string) => {
     appState.setPayMethod(data);
 })
 
-events.on('order-field:input', (data: {field: keyof IDeliveryInfo, value: string}) => {
+events.on(AppEvents['order-field:input'], (data: {field: keyof IDeliveryInfo, value: string}) => {
     appState.setDeliveryFormField(data.field, data.value);
 })
 
-events.on('order:validation', (message: string) => {
+events.on(AppEvents['order:validation'], (message: string) => {
     orderFormView.render({
         valid: false,
         errors: message
     })
 })
 
-events.on('deliveryInfo:ready', () => {
+events.on(AppEvents['deliveryInfo:ready'], () => {
     orderFormView.render({
         valid: true,
         errors: ''
     });
 })
 
-events.on('order-form:submit', () => {
+events.on(AppEvents['order-form:submit'], () => {
     modalView.render({
         content: contactsFormView.render({
             email: appState.order.email,
@@ -178,35 +173,33 @@ events.on('order-form:submit', () => {
     })
 })
 
-events.on('contacts-field:input', (data: {field: keyof IContacts, value: string}) => {
+events.on(AppEvents['contacts-field:input'], (data: {field: keyof IContacts, value: string}) => {
     appState.setContactsFormField(data.field, data.value);
 })
 
-events.on('contacts:validation', (message: string) => {
+events.on(AppEvents['contacts:validation'], (message: string) => {
     contactsFormView.render({
         valid: false,
         errors: message
     })
 })
 
-events.on('contacts:ready', () => {
+events.on(AppEvents['contacts:ready'], () => {
     contactsFormView.render({
         valid: true,
         errors: ''
     });
 })
 
-events.on('contacts-form:submit', () => {
+events.on(AppEvents['contacts-form:submit'], () => {
     api.sendOrder(appState.order)
         .then((data) => {
-            events.emit('order:send', data.total);
+            events.emit(AppEvents['order:send'], data.total);
         })
-        .catch(err => {
-        console.error(err);
+        .catch(console.error);
     });
-})        
 
-events.on('order:send', (total: number) => {  
+events.on(AppEvents['order:send'], (total: number) => {  
     modalView.render({
         content: successView.render({
             total: total
@@ -215,7 +208,7 @@ events.on('order:send', (total: number) => {
     appState.clearOrderInfo();
 })    
 
-events.on('order:finished', () => {
+events.on(AppEvents['order:finished'], () => {
         modalView.close();
     })
 
@@ -223,6 +216,4 @@ api.getCatalog()
     .then((data) => {
         appState.setCatalog(data);
     })
-    .catch(err => {
-        console.error(err);
-    });
+    .catch(console.error);
