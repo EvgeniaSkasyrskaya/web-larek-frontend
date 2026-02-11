@@ -6,8 +6,34 @@ export class AppApi extends Api implements IAppApi
     readonly cdn: string;
 
     constructor(cdn: string, baseUrl: string, options?: RequestInit) {
-        super(baseUrl, options);
-        this.cdn = cdn;
+        // добавлено автоматическое исправление baseUrl для возможности деплоя на gh-pages
+        let correctedBaseUrl = baseUrl;
+        // Если baseUrl начинается с '/' (относительный путь)
+        if (correctedBaseUrl.startsWith('/')) {
+            console.warn(`Fixing relative baseUrl: ${correctedBaseUrl}`);
+            correctedBaseUrl = 'https://larek-api.nomoreparties.co' + correctedBaseUrl;
+        }
+        
+        // Если baseUrl пустой или undefined
+        if (!correctedBaseUrl || correctedBaseUrl === '') {
+            console.warn('baseUrl is empty, using default');
+            correctedBaseUrl = 'https://larek-api.nomoreparties.co/api/weblarek';
+        }
+        
+        // Убедимся что это абсолютный URL
+        if (!correctedBaseUrl.startsWith('http')) {
+            correctedBaseUrl = 'https://larek-api.nomoreparties.co/api/weblarek';
+        }
+        super(correctedBaseUrl, options);
+        // аналогично для cdn
+        let correctedCdn = cdn;
+        if (correctedCdn.startsWith('/')) {
+            correctedCdn = 'https://larek-api.nomoreparties.co' + correctedCdn;
+        }
+        if (!correctedCdn || correctedCdn === '') {
+            correctedCdn = 'https://larek-api.nomoreparties.co/content/weblarek';
+        }
+        this.cdn = correctedCdn;
     }
 
     getCatalog(): Promise<IItem[]> {
