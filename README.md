@@ -3,6 +3,7 @@
 Web-ларёк - интернет-магазин с товарами для веб-разработчиков, в нём можно посмотреть каталог товаров, добавить товары в корзину и сделать заказ. 
 
 [Макет в Figma](https://www.figma.com/design/0KMR7HxUUMyRPMjuCvQEN1/8-%D1%81%D0%BF%D1%80%D0%B8%D0%BD%D1%82.-%D0%92%D0%B5%D0%B1-%D0%BB%D0%B0%D1%80%D1%91%D0%BA?node-id=0-1&p=f&t=TiO7vA2mWrNwhU7v-0)  
+[Ссылка на результат проектой работы](https://evgeniaskasyrskaya.github.io/web-larek-frontend/)
 
 ### Стек: HTML, SCSS, TypeScript, MVP-паттерн, Webpack, REST API
 
